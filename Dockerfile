@@ -1,8 +1,13 @@
 FROM odoo:16.0
-USER root
-RUN mkdir -p /custom-config && chown odoo:odoo /custom-config
-COPY --chown=odoo:odoo odoo.conf /custom-config/
-COPY --chown=odoo:odoo entrypoint.sh /custom-config/
-RUN chmod +x /custom-config/entrypoint.sh
-USER odoo
-ENTRYPOINT ["/custom-config/entrypoint.sh"]
+
+# Crea cartella per il database SQLite
+RUN mkdir -p /var/lib/odoo && chown odoo /var/lib/odoo
+
+# Avvia Odoo con SQLite
+CMD ["python3", "/usr/bin/odoo", \
+    "--http-port=8069", \
+    "--database=odoo.db", \
+    "--db_host=False", \
+    "--db_user=False", \
+    "--db_password=False", \
+    "--addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons"]
