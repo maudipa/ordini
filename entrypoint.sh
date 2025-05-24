@@ -1,24 +1,16 @@
 #!/bin/bash
 set -e
 
-# Valori di default
-DEFAULT_PORT=8069
-DEFAULT_DB_PORT=5432  # <-- AGGIUNGI QUESTO
+# Test connessione database (debug)
+echo "Testing DB connection..."
+PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "\conninfo" || exit 1
 
-# Attendi PostgreSQL se configurato
-if [ -n "$DB_HOST" ]; then
-  echo "Waiting for PostgreSQL at ${DB_HOST}:${DB_PORT:-$DEFAULT_DB_PORT}..."
-  until pg_isready -h "$DB_HOST" -p "${DB_PORT:-$DEFAULT_DB_PORT}" -U "$DB_USER"; do
-    sleep 1
-  done
-fi
-
-# Avvia Odoo con parametri validati
+# Avvia Odoo SENZA spazi tra parametri
 exec python3 /usr/bin/odoo \
   --http-interface="${HOST:-0.0.0.0}" \
-  --http-port="${PORT:-$DEFAULT_PORT}" \
-  --database="${DB_NAME:-odoo}" \
-  --db_host="${DB_HOST:-db}" \
-  --db_port="${DB_PORT:-$DEFAULT_DB_PORT}" \  # <-- GARANTISCE UN NUMERO VALIDO
-  --db_user="${DB_USER:-odoo}" \
-  --db_password="${DB_PASSWORD:-odoo}"
+  --http-port="${PORT:-8069}" \
+  --database="$DB_NAME" \
+  --db_host="$DB_HOST" \
+  --db_port="$DB_PORT" \
+  --db_user="$DB_USER" \
+  --db_password="$DB_PASSWORD"
