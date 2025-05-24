@@ -1,4 +1,4 @@
-FROM odoo:15.0  # Versione stabile con SQLite
+FROM odoo:15.0
 
 CMD ["python3", "/usr/bin/odoo", \
     "--http-port=8069", \
