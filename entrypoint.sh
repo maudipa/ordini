@@ -1,15 +1,14 @@
 #!/bin/bash
 set -e
 
-# Copia i file di configurazione (ignora errori se già esistenti)
-cp /custom-entrypoint/odoo.conf /etc/odoo/ 2>/dev/null || true
-cp /custom-entrypoint/wait-for-psql.py /usr/local/bin/ 2>/dev/null || true
+# Copia configurazione solo se non esiste
+[ ! -f /etc/odoo/odoo.conf ] && cp /custom-config/odoo.conf /etc/odoo/
 
 # Avvia Odoo con parametri espliciti
 exec python3 /usr/bin/odoo \
+  --http-interface=${HOST:-0.0.0.0} \
   --http-port=${PORT:-8069} \
-  --db_host=${DB_HOST:-False} \
-  --db_port=${DB_PORT:-False} \
+  --database=${DB_NAME:-odoo} \
+  --db_host=${DB_HOST:-db} \
   --db_user=${DB_USER:-odoo} \
-  --db_password=${DB_PASSWORD:-False} \
-  --addons-path=${ADDONS_PATH:-/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons}
+  --db_password=${DB_PASSWORD:-odoo}
